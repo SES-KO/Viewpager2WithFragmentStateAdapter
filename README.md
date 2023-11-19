@@ -132,3 +132,68 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
+Add the menus
+=============
+Create a directorty ```menu``` in ```res```.
+
+Create menu resource file ```menu_fragment_a.xml```:
+
+```xml
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_fragment_a"
+        android:orderInCategory="100"
+        android:title="Fragment A Aktion"
+        app:showAsAction="never" />
+</menu>
+```
+
+and ```menu_fragment_b.xml```:
+
+```xml
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_fragment_b"
+        android:orderInCategory="100"
+        android:title="Fragment B Aktion"
+        app:showAsAction="never" />
+</menu>
+```
+
+Add to the FragmentA:
+```kotlin
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_fragment_a, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_fragment_a -> {
+                // add function call here
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+```
+
+and to the FragmentB:
+```kotlin
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_fragment_b menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_fragment_b -> {
+                // add function call here
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+```
