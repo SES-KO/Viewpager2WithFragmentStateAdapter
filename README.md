@@ -49,7 +49,7 @@ Add the color definition to ```res/values/colors.xml```:
 
 Create the main activity view
 =============================
-Create a ```res```directory ```layout``` with the view ```activity_main.xml```:
+Create a ```res```directory ```layout``` with the layout resource file ```activity_main.xml```:
 
 ```kotlin
 <?xml version="1.0" encoding="utf-8"?>
