@@ -5,8 +5,29 @@ Setting up the project
 ======================
 In Android Studio create a new project from template "Basic View Activity".
 
-The Pager Adapter
-=================
+Create two fragments
+====================
+Run ```New->Fragment->Fragment (blank)``` and name it ```FragmentA```.
+
+Run ```New->Fragment->Fragment (blank)``` and name it ```FragmentB```.
+
+Change the hello string in ```fragment_a.xml``` to:
+
+```xml
+android:text="@string/hello_fragment_a" />
+```
+
+and in ```fragment_b.xml``` to:
+
+```xml
+android:text="@string/hello_fragment_b" />
+```
+
+and fill the string variables in ```strings.xml``` accordingly.
+
+
+Create the Pager Adapter
+========================
 Create a kotlin file ```PagerAdapter.kt``` with the class definition:
 
 ```kotlin
@@ -68,7 +89,8 @@ Create a ```res```directory ```layout``` with the layout resource file ```activi
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 ```
 
-Add to ```MainActivity.kt```:
+Update the Main Activity:
+=========================
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
