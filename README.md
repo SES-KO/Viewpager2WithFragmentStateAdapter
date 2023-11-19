@@ -172,6 +172,7 @@ Add to the FragmentA:
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_fragment_a -> {
+                // add function call here
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -189,6 +190,7 @@ and to the FragmentB:
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_fragment_b -> {
+                // add function call here
                 true
             }
             else -> super.onOptionsItemSelected(item)
