@@ -7,7 +7,9 @@ import androidx.viewpager2.widget.ViewPager2
 
 
 class MainActivity : AppCompatActivity() {
-    var pagerAdapter: PagerAdapter? = null
+    companion object {
+        var pagerAdapter: PagerAdapter? = null
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         val viewPager: ViewPager2 = findViewById<ViewPager2>(R.id.viewPager)
         pagerAdapter = PagerAdapter(supportFragmentManager, lifecycle)
         pagerAdapter!!.addFragment(FragmentA())
-        pagerAdapter!!.addFragment(FragmentB())
+        //pagerAdapter!!.addFragment(FragmentB())
         viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL)
         viewPager.adapter = pagerAdapter
         viewPager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT

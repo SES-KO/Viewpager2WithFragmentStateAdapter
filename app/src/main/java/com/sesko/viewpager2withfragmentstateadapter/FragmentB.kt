@@ -47,8 +47,10 @@ class FragmentB : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_fragment_b -> {
-                // add function call here
+            R.id.action_add_fragment_a -> {
+                MainActivity.pagerAdapter!!.addFragment(FragmentA())
+                val fragmentNum = MainActivity.pagerAdapter?.itemCount ?: 0
+                MainActivity.pagerAdapter?.createFragment(fragmentNum-1)
                 true
             }
             else -> super.onOptionsItemSelected(item)

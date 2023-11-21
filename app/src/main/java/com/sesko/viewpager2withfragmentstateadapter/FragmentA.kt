@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import com.sesko.viewpager2withfragmentstateadapter.MainActivity.Companion.pagerAdapter
 import java.util.Calendar
 
 // TODO: Rename parameter arguments, choose names that match
@@ -48,8 +49,10 @@ class FragmentA : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_fragment_a -> {
-                // add function call here
+            R.id.action_add_fragment_b -> {
+                pagerAdapter!!.addFragment(FragmentB())
+                val fragmentNum = pagerAdapter?.itemCount ?: 0
+                pagerAdapter?.createFragment(fragmentNum-1)
                 true
             }
             else -> super.onOptionsItemSelected(item)
