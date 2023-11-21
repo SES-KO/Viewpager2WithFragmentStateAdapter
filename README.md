@@ -142,9 +142,9 @@ Create menu resource file ```menu_fragment_a.xml```:
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_fragment_a"
+        android:id="@+id/action_add_fragment_b"
         android:orderInCategory="100"
-        android:title="Fragment A Aktion"
+        android:title="Add fragment B"
         app:showAsAction="never" />
 </menu>
 ```
@@ -155,9 +155,9 @@ and ```menu_fragment_b.xml```:
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_fragment_b"
+        android:id="@+id/action_add_fragment_a"
         android:orderInCategory="100"
-        android:title="Fragment B Aktion"
+        android:title="Add fragment A"
         app:showAsAction="never" />
 </menu>
 ```
@@ -191,6 +191,54 @@ and to the FragmentB:
         return when (item.itemId) {
             R.id.action_fragment_b -> {
                 // add function call here
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+```
+
+Enable runtime fragment change
+==============================
+
+Add the listener to the page adapter
+------------------------------------
+Add ```notifyDataSetChanged()``` to the ```addFragment``` function in our ```PagerAdapter.kt```:
+
+```kotlin
+    fun addFragment(fragment: Fragment) {
+        fragmentList.add(fragment)
+        notifyDataSetChanged()
+    }
+```
+
+Add create fragment to the menu actions
+---------------------------------------
+Fill the action in ```onOptionsItemSelected``` in FragmentA:
+
+```kotlin
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_add_fragment_b -> {
+                pagerAdapter!!.addFragment(FragmentB())
+                val fragmentNum = pagerAdapter?.itemCount ?: 0
+                pagerAdapter?.createFragment(fragmentNum-1)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+```
+
+and in FragmentB:
+
+```kotlin
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_add_fragment_a -> {
+                pagerAdapter!!.addFragment(FragmentA())
+                val fragmentNum = pagerAdapter?.itemCount ?: 0
+                pagerAdapter?.createFragment(fragmentNum-1)
                 true
             }
             else -> super.onOptionsItemSelected(item)
