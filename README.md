@@ -225,8 +225,6 @@ Fill the action in ```onOptionsItemSelected``` in FragmentA:
         return when (item.itemId) {
             R.id.action_add_fragment_b -> {
                 pagerAdapter!!.addFragment(FragmentB())
-                val fragmentNum = pagerAdapter?.itemCount ?: 0
-                pagerAdapter?.createFragment(fragmentNum-1)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -241,8 +239,6 @@ and in FragmentB:
         return when (item.itemId) {
             R.id.action_add_fragment_a -> {
                 pagerAdapter!!.addFragment(FragmentA())
-                val fragmentNum = pagerAdapter?.itemCount ?: 0
-                pagerAdapter?.createFragment(fragmentNum-1)
                 true
             }
             else -> super.onOptionsItemSelected(item)
