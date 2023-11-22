@@ -8,8 +8,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import com.sesko.viewpager2withfragmentstateadapter.MainActivity.Companion.pagerAdapter
-import java.util.Calendar
+import java.util.UUID
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,6 +38,7 @@ class FragmentA : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_a, container, false)
     }
@@ -50,14 +51,16 @@ class FragmentA : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_add_fragment_b -> {
-                pagerAdapter!!.addFragment(FragmentB())
-                val fragmentNum = pagerAdapter?.itemCount ?: 0
-                pagerAdapter?.createFragment(fragmentNum-1)
+                MainActivity.pagerAdapter!!.addFragment(FragmentB.newInstance(getUUID()))
+                // show new page
+                MainActivity.viewPager!!.currentItem = MainActivity.pagerAdapter!!.itemCount-1
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    fun getUUID() = UUID.randomUUID().toString()
 
     companion object {
         /**

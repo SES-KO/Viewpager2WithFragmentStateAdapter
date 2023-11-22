@@ -1,18 +1,19 @@
 package com.sesko.viewpager2withfragmentstateadapter
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val ARG_PARAM1 = "Fragment UUID"
 
 /**
  * A simple [Fragment] subclass.
@@ -21,14 +22,12 @@ private const val ARG_PARAM2 = "param2"
  */
 class FragmentB : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var uuidString: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            uuidString = it.getString(ARG_PARAM1)
         }
     }
 
@@ -36,8 +35,14 @@ class FragmentB : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_b, container, false)
+        setHasOptionsMenu(true)
+
+        val view = inflater.inflate(R.layout.fragment_b, container, false)
+
+        val uuid = view.findViewById(R.id.content) as TextView
+        uuid.text = uuidString
+
+        return view
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -47,10 +52,10 @@ class FragmentB : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_add_fragment_a -> {
-                MainActivity.pagerAdapter!!.addFragment(FragmentA())
-                val fragmentNum = MainActivity.pagerAdapter?.itemCount ?: 0
-                MainActivity.pagerAdapter?.createFragment(fragmentNum-1)
+            R.id.action_remove_this_fragment -> {
+                MainActivity.pagerAdapter!!.removeFragment(this)
+                // show most right page
+                MainActivity.viewPager!!.currentItem = MainActivity.pagerAdapter!!.itemCount-1
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -68,11 +73,10 @@ class FragmentB : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(uuidString: String) =
             FragmentB().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putString(ARG_PARAM1, uuidString)
                 }
             }
     }

@@ -1,8 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_add_fragment_a"
+        android:id="@+id/action_remove_this_fragment"
         android:orderInCategory="100"
-        android:title="Add fragment A"
+        android:title="Remove this fragment"
         app:showAsAction="never" />
 </menu>
