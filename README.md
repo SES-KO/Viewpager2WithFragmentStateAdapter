@@ -14,16 +14,18 @@ Run ```New->Fragment->Fragment (blank)``` and name it ```FragmentB```.
 Change the hello string in ```fragment_a.xml``` to:
 
 ```xml
-android:text="@string/hello_fragment_a" />
+        android:text="@string/hello_fragment_a" />
 ```
 
-and in ```fragment_b.xml``` to:
+and in ```fragment_b.xml``` accordingly but also add an id ```content``` to the textview:
 
 ```xml
-android:text="@string/hello_fragment_b" />
+        android:id="@+id/content"
+        android:text="@string/hello_fragment_b" />
 ```
 
 and fill the string variables in ```strings.xml``` accordingly.
+We will need the ```content``` id later.
 
 
 Create the Pager Adapter
@@ -34,16 +36,37 @@ Create a kotlin file ```PagerAdapter.kt``` with the class definition:
 class PagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
     FragmentStateAdapter(fragmentManager, lifecycle) {
     private val fragmentList = ArrayList<Fragment>()
+    private val pageIds = fragmentList.map { it.hashCode().toLong() }
+
     override fun createFragment(position: Int): Fragment {
         return fragmentList[position]
     }
 
     fun addFragment(fragment: Fragment) {
         fragmentList.add(fragment)
+        notifyItemChanged(itemCount -1)
+    }
+
+    fun removeFragment(fragment: Fragment) {
+        val position = getPosition(fragment)
+        fragmentList.remove(fragment)
+        notifyItemRemoved(position)
+    }
+
+    fun getPosition(fragment: Fragment): Int {
+        return fragmentList.indexOf(fragment)
     }
 
     override fun getItemCount(): Int {
         return fragmentList.size
+    }
+
+    override fun getItemId(position: Int): Long {
+        return fragmentList[position].hashCode().toLong()
+    }
+
+    override fun containsItem(itemId: Long): Boolean {
+        return pageIds.contains(itemId)
     }
 }
 ```
@@ -96,6 +119,7 @@ Update the Main Activity:
 class MainActivity : AppCompatActivity() {
     companion object {
         var pagerAdapter: PagerAdapter? = null
+        var viewPager: ViewPager2? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,29 +130,12 @@ class MainActivity : AppCompatActivity() {
         // overwrite appbar title
         this.title = "My title"
 
-        val viewPager: ViewPager2 = findViewById<ViewPager2>(R.id.viewPager)
         pagerAdapter = PagerAdapter(supportFragmentManager, lifecycle)
         pagerAdapter!!.addFragment(FragmentA())
-        viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL)
-        viewPager.adapter = pagerAdapter
-        viewPager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-            override fun onPageSelected(position: Int) {
-                invalidateOptionsMenu(position)
-            }
 
-            override fun onPageScrollStateChanged(state: Int) {}
-        })
-        invalidateOptionsMenu(0)
-    }
-
-    private fun invalidateOptionsMenu(position: Int) {
-        for (i in 0 until (pagerAdapter?.itemCount ?: 0)) {
-            val fragment: Fragment? = pagerAdapter?.createFragment(i)
-            fragment?.setHasOptionsMenu(i == position)
-        }
-        invalidateOptionsMenu()
+        viewPager = findViewById<ViewPager2>(R.id.viewPager)
+        viewPager!!.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        viewPager!!.adapter = pagerAdapter
     }
 }
 ```
@@ -159,15 +166,24 @@ and ```menu_fragment_b.xml```:
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_add_fragment_a"
+        android:id="@+id/action_remove_this_fragment"
         android:orderInCategory="100"
-        android:title="Add fragment A"
+        android:title="Remove this fragment"
         app:showAsAction="never" />
 </menu>
 ```
 
 Add to the FragmentA:
+
 ```kotlin
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true)
+        ...
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_fragment_a, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -185,7 +201,16 @@ Add to the FragmentA:
 ```
 
 and to the FragmentB:
+
 ```kotlin
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true)
+        ...
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_fragment_b menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -205,43 +230,81 @@ and to the FragmentB:
 Enable runtime fragment change
 ==============================
 
-Add the listener to the page adapter
-------------------------------------
-Add ```notifyDataSetChanged()``` to the ```addFragment``` function in our ```PagerAdapter.kt```:
-
-```kotlin
-    fun addFragment(fragment: Fragment) {
-        fragmentList.add(fragment)
-        notifyDataSetChanged()
-    }
-```
-
 Add create fragment to the menu actions
 ---------------------------------------
-Fill the action in ```onOptionsItemSelected``` in FragmentA:
+Fill the action in ```onOptionsItemSelected``` in FragmentA and add a function to create a unique id string:
 
 ```kotlin
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_add_fragment_b -> {
-                pagerAdapter!!.addFragment(FragmentB())
+                MainActivity.pagerAdapter!!.addFragment(FragmentB.newInstance(getUUID()))
+                // show new page
+                MainActivity.viewPager!!.currentItem = MainActivity.pagerAdapter!!.itemCount-1
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    fun getUUID() = UUID.randomUUID().toString()
 ```
 
-and in FragmentB:
+Change the content of FragmentB to:
 
 ```kotlin
+class FragmentB : Fragment() {
+    private var uuidString: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            uuidString = it.getString(ARG_PARAM1)
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true)
+
+        val view = inflater.inflate(R.layout.fragment_b, container, false)
+
+        val uuid = view.findViewById(R.id.content) as TextView
+        uuid.text = uuidString
+
+        return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_fragment_b, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_add_fragment_a -> {
-                pagerAdapter!!.addFragment(FragmentA())
+            R.id.action_remove_this_fragment -> {
+                MainActivity.pagerAdapter!!.removeFragment(this)
+                // show most right page
+                MainActivity.viewPager!!.currentItem = MainActivity.pagerAdapter!!.itemCount-1
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(uuidString: String) =
+            FragmentB().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, uuidString)
+                }
+            }
+    }
+}
 ```
+
+
+That's it!
